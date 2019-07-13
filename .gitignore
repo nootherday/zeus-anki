@@ -102,3 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+config.json
+client_secrets.json
+storage.json
+/tts
+/csv
+*.apkg
