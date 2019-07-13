@@ -17,12 +17,12 @@ class ZeusTTS():
 
     def generate(self, text):
         if re.search('[a-zA-Z]', text) is None:
-            return
+            return None
 
         filename = os.path.join(self._path, text.lower().replace(" ", "_") + ".mp3")
 
         if os.path.exists(filename):
-            return
+            return filename
 
         print (f"generate {text}")
 
@@ -48,6 +48,7 @@ class ZeusTTS():
         audio.export(filename, format="mp3")
         os.remove(temp_filename)
 
+        return filename
 if __name__ == "__main__":
     import json
 
