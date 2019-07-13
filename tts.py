@@ -5,6 +5,9 @@ import sys
 import os
 import re
 
+def get_filename(text):
+    return re.sub("[^a-z]", "_", text.lower()) + ".mp3"
+
 class ZeusTTS():
     def __init__(self, config):
         session = boto3.Session(
@@ -19,7 +22,7 @@ class ZeusTTS():
         if re.search('[a-zA-Z]', text) is None:
             return None
 
-        filename = os.path.join(self._path, text.lower().replace(" ", "_") + ".mp3")
+        filename = os.path.join(self._path, get_filename(text))
 
         if os.path.exists(filename):
             return filename
@@ -49,6 +52,7 @@ class ZeusTTS():
         os.remove(temp_filename)
 
         return filename
+
 if __name__ == "__main__":
     import json
 
