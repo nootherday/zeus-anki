@@ -3,6 +3,7 @@ from pydub import AudioSegment
 
 import sys
 import os
+import re
 
 class ZeusTTS():
     def __init__(self, config):
@@ -15,6 +16,9 @@ class ZeusTTS():
         self._polly = session.client('polly', region_name=config["aws_region"])
 
     def generate(self, text):
+        if re.search('[a-zA-Z]', text) is None:
+            return
+
         filename = os.path.join(self._path, text.lower().replace(" ", "_") + ".mp3")
 
         if os.path.exists(filename):
@@ -52,3 +56,5 @@ if __name__ == "__main__":
 
         tts = ZeusTTS(config["tts"])
         tts.generate("my test")
+        tts.generate("my test")
+        tts.generate("한")
