@@ -1,4 +1,4 @@
-boto3==1.9.180
+boto3==1.16.22
 genanki==0.7.0
 gsheets==0.3.2
 pydub==0.23.1

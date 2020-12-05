@@ -4,9 +4,11 @@ from pydub import AudioSegment
 import sys
 import os
 import re
+import hashlib
 
 def get_filename(text):
-    return re.sub("[^a-z]", "_", text.lower()) + ".mp3"
+    h = hashlib.sha256(text.encode('utf-8')).hexdigest()[:5]
+    return re.sub("[^a-z]", "_", text.lower())[:20] + "_" + h + ".mp3"
 
 class ZeusTTS():
     def __init__(self, config):
@@ -31,22 +33,29 @@ class ZeusTTS():
 
         temp_filename = os.path.join(self._path, "_temp.mp3")
         audio = None
+
         for voice_id in self._voice_ids:
             response = self._polly.synthesize_speech(
+                Engine = 'neural',
+                LanguageCode = 'en-US',
                 VoiceId = voice_id,
-                TextType = 'ssml',
+                TextType = 'text',
                 OutputFormat = 'mp3', 
-                Text = f'<speak><prosody rate="slow">{text}</prosody></speak>')
+                Text = f'{text}')
+                # TextType = 'ssml',
+                # Text = f'<speak><prosody rate="slow">{text}</prosody></speak>')
+                
 
             file = open(temp_filename, 'wb')
             file.write(response['AudioStream'].read())
             file.close()
 
-            cur = AudioSegment.from_mp3(temp_filename)
-            if audio == None:
-                audio = cur
-            else:
-                audio = audio + AudioSegment.silent(duration=self._interval_in_seconds * 1000) + cur
+            for i in range(2):
+                cur = AudioSegment.from_mp3(temp_filename)
+                if audio == None:
+                    audio = cur
+                else:
+                    audio = audio + AudioSegment.silent(duration=self._interval_in_seconds * 1000) + cur
 
         audio.export(filename, format="mp3")
         os.remove(temp_filename)
@@ -61,5 +70,3 @@ if __name__ == "__main__":
 
         tts = ZeusTTS(config["tts"])
         tts.generate("my test")
-        tts.generate("my test")
-        tts.generate("한")

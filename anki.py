@@ -26,8 +26,8 @@ class ZeusAnki():
             templates=[
                 {
                     'name': 'Card 1',
-                    'qfmt': '{{Question}}',
-                    'afmt': '{{FrontSide}}<hr id="answer">{{Answer}}',
+                    'qfmt': "<div style='font-size: 30px;text-align: center;'>{{Question}}</div>",
+                    'afmt': "<div style='font-size: 30px;text-align: center;'>{{FrontSide}}<hr id='answer'>{{Answer}}</div>",
                 },
             ]
         )
@@ -42,8 +42,9 @@ class ZeusAnki():
             templates=[
                 {
                     'name': 'Card 1',
-                    'qfmt': '{{Question}}<br>{{MyMedia}}',
-                    'afmt': '{{FrontSide}}<hr id="answer">{{Answer}}',
+                    'qfmt': "<div style='font-size: 30px;text-align: center;'>{{Question}}<br>{{MyMedia}}</div>",
+                    'afmt': "<div style='font-size: 30px;text-align: center;'>{{FrontSide}}<hr id='answer'>{{Answer}}</div>",
+
                 },
             ]
         )
@@ -53,15 +54,20 @@ class ZeusAnki():
         deck = genanki.Deck(int(abs(hash(name)) / 100000000), name)
         media_files = []
         with open(csv_filename) as csv_file:
+            i = 0
             for row in csv.reader(csv_file):
-                if len(row) != 2:
+                if len(row) != 3:
                     continue
                 q = row[0].strip()
-                a = row[1].strip()
+                q_tts = row[1].strip()
+                a = row[2].strip()
                 if len(q) == 0 or len(a) == 0:
                     continue
 
-                audio = self._tts.generate(q)
+                i += 1
+                if q.startswith("* "):
+                    q = q.replace("* ", str(i) + ". ")
+                audio = self._tts.generate(q_tts)
                 if audio is not None:
                     audio_name = os.path.basename(audio)
                     note = genanki.Note(model=self._model["tts"], fields=[q, a, f"[sound:{audio_name}]"])
